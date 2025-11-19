@@ -48,6 +48,41 @@ WCAG 2.1 AA準拠を目指した実用的なチェックを行います。
 - 色だけで情報を伝えていないか
 - エラー表示は色以外でも識別可能か
 
+#### ダークモードでのコントラスト
+ダークモードでは特に以下の点に注意:
+
+```typescript
+// ❌ 悪い例: コントラスト不足
+<div className="dark:bg-slate-900 dark:text-slate-700">
+  {/* コントラスト比: 2.8:1 - WCAG AA不合格 */}
+</div>
+
+// ✅ 良い例: 十分なコントラスト
+<div className="dark:bg-slate-900 dark:text-slate-100">
+  {/* コントラスト比: 12.6:1 - WCAG AAA合格 */}
+</div>
+```
+
+**推奨コントラスト比（ダークモード）:**
+- 通常テキスト: 最低4.5:1（推奨7:1以上）
+- 大きなテキスト（18pt以上 or 14pt太字）: 最低3:1（推奨4.5:1以上）
+- UIコンポーネント: 最低3:1
+- グラフィック要素: 最低3:1
+
+**ダークモード配色の検証:**
+| 背景色 | テキスト色 | コントラスト比 | 評価 |
+|--------|-----------|---------------|------|
+| #020617 (slate-950) | #f8fafc (slate-50) | 19.7:1 | ✅ AAA |
+| #0f172a (slate-900) | #e2e8f0 (slate-200) | 14.1:1 | ✅ AAA |
+| #1e293b (slate-800) | #cbd5e1 (slate-300) | 9.8:1 | ✅ AAA |
+| #334155 (slate-700) | #94a3b8 (slate-400) | 3.2:1 | ❌ AA不合格 |
+
+**自動チェックツール:**
+- Chrome DevTools の Lighthouse
+- axe DevTools の Color Contrast Analyzer
+- WebAIM の Contrast Checker
+- Polypane の Visual Testing Tools
+
 ### 動的コンテンツ
 - ローディング状態はスクリーンリーダーに通知されるか（aria-live）
 - フォーカス管理は適切か（モーダル、ページ遷移）

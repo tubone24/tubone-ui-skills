@@ -26,6 +26,32 @@ description: UIコードの実用的なレビューを行う
 - ARIA属性は適切か（過剰でないか）
 - コントラスト比は十分か（視覚的要素がある場合）
 
+### ダークモード対応
+- ライト/ダークモード両方で適切なコントラストが保たれているか
+- テーマ切り替え時の状態管理は適切か（LocalStorage、Context APIなど）
+- カラーパレットは一貫性があるか
+- ダークモード特有のUI問題（グローや過度な明度など）はないか
+
+**配色チェックポイント:**
+```typescript
+// ❌ 悪い例: ハードコードされた色
+<div className="bg-white text-black">
+
+// ✅ 良い例: テーマに応じた色
+<div className="bg-white dark:bg-slate-900 text-black dark:text-slate-50">
+
+// ❌ 悪い例: ダークモードで見えにくい
+<div className="dark:bg-slate-950 dark:text-slate-900">  {/* コントラスト不足 */}
+
+// ✅ 良い例: 十分なコントラスト
+<div className="dark:bg-slate-950 dark:text-slate-50">  {/* コントラスト比 > 4.5:1 */}
+```
+
+**テーマ切り替えのベストプラクティス:**
+- システム設定を尊重する（prefers-color-scheme）
+- ユーザーの選択を永続化する
+- テーマ切り替え時のフラッシュを防ぐ（SSR時）
+
 ### パフォーマンス
 - 大きなリストの仮想化は必要か
 - 画像の最適化は適切か
