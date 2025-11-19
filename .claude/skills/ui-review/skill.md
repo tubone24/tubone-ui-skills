@@ -26,6 +26,79 @@ description: UIコードの実用的なレビューを行う
 - ARIA属性は適切か（過剰でないか）
 - コントラスト比は十分か（視覚的要素がある場合）
 
+### ダークモード対応
+- ライト/ダークモード両方で適切なコントラストが保たれているか
+- テーマ切り替え時の状態管理は適切か（CSS変数、OKLCHなど）
+- カラーパレットは一貫性があるか（FinBroスタイル推奨）
+- ダークモード特有のUI問題（グローや過度な明度など）はないか
+
+**配色チェックポイント（FinBroスタイル）:**
+```typescript
+// ❌ 悪い例: ハードコードされた色（テーマ非対応）
+<div className="bg-white text-black">
+
+// ✅ 良い例: CSS変数を使用
+<div className="bg-card text-card-foreground">
+
+// ❌ 悪い例: コントラスト不足
+<div className="bg-[#0D0D0D] text-gray-600">  {/* 3.2:1 - AA不合格 */}
+
+// ✅ 良い例: 十分なコントラスト（FinBroパレット）
+<div className="bg-[#0D0D0D] text-[#E7E7E7]">  {/* 13.5:1 - AAA */}
+<div className="bg-[#0D0D0D] text-[#919191]">  {/* 5.8:1 - AA */}
+<div className="bg-[#1A1A1A] text-white">       {/* 15.8:1 - AAA */}
+
+// ❌ 悪い例: アクセント色の過度な使用
+<div className="bg-[#86efac] text-white">  {/* 目が疲れる */}
+
+// ✅ 良い例: アクセント色は控えめに
+<span className="text-[#4ADE80]">+12.5%</span>  {/* ポジティブ値のみ */}
+```
+
+**OKLCHカラースペース活用:**
+```css
+/* ✅ 推奨: OKLCH（知覚的に均一な色空間） */
+.dark {
+  --background: oklch(0.145 0 0);      /* より正確な色表現 */
+  --foreground: oklch(0.985 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+}
+
+/* ❌ 避ける: RGB/HEXハードコード */
+.dark {
+  background: #0D0D0D;  /* テーマ切り替えに非対応 */}
+```
+
+**テーマ管理のベストプラクティス:**
+- CSS変数ベースのテーマ管理（`:root` / `.dark`）
+- システム設定を尊重する（`prefers-color-scheme`）
+- Next.js SSRでのフラッシュ防止（`html className="dark"`）
+- ユーザーの選択を永続化しない（システム設定に従う）
+
+**FinBro特有のチェックポイント:**
+```typescript
+// ✅ 背景の階層構造
+bg-black           // #000000 - ページ背景
+bg-[#0D0D0D]       // カード背景
+bg-[#1A1A1A]       // ホバー/セカンダリ
+bg-[#2A2A2A]       // アクティブ状態
+
+// ✅ テキストの階層構造
+text-white         // #FFFFFF - 最重要（21:1）
+text-[#E7E7E7]     // プライマリ（13.5:1）
+text-[#919191]     // セカンダリ/ミュート（5.8:1）
+text-gray-400      // 無効状態
+
+// ✅ ボーダーの使い方
+border-[#1F1F1F]   // メインボーダー（控えめ）
+border-[#333]      // セカンダリボーダー（やや強調）
+border-transparent // ホバー時のみ表示（テーブルなど）
+
+// ❌ 避けるパターン
+border-white       // 過度に目立つ
+text-white + bg-white  // 同じ明度
+```
+
 ### パフォーマンス
 - 大きなリストの仮想化は必要か
 - 画像の最適化は適切か
